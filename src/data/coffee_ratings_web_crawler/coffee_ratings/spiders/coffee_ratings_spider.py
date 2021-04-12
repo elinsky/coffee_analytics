@@ -7,15 +7,13 @@ class CoffeeRatingsSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            'https://www.coffeereview.com/review/'
+            # 'https://www.coffeereview.com/review/'
+            'https://www.coffeereview.com/review/foundry-blend/'
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
 
     def parse(self, response):
-        def extract_table_field(table_selector, idx: int) -> str:
-            return table_selector.xpath('//tr')[idx].xpath('td//text()').extract()[1]
-
         def save_raw_data(response, page_dirname: str) -> None:
             page = response.url.split("/")[-2]
             filename = f'{page}.html'
@@ -24,10 +22,7 @@ class CoffeeRatingsSpider(scrapy.Spider):
             self.log(f'Saved file {filename}')
 
         def extract_if_exists(xpath: str):
-            if response.xpath(xpath):
-                return response.xpath(xpath).get()
-            else:
-                return 'NA'
+            return response.xpath(xpath).get() if response.xpath(xpath) else 'NA'
 
         def parse_review_page(response) -> dict:
             # Parse content
@@ -72,7 +67,17 @@ class CoffeeRatingsSpider(scrapy.Spider):
             else:
                 return []
 
-        page_dirname = 'raw_coffee_data'
+        def calculate_raw_data_dir():
+            dir = os.path.dirname(__file__)
+            dir = os.path.dirname(dir)
+            dir = os.path.dirname(dir)
+            dir = os.path.dirname(dir)
+            dir = os.path.dirname(dir)
+            dir = os.path.dirname(dir)
+            dir += '/data/raw/'
+            return dir
+
+        page_dirname = calculate_raw_data_dir()
         self.log("parsing page: " + response.url)
 
         urls_to_crawl = extract_coffee_review_urls(response)
@@ -87,7 +92,6 @@ class CoffeeRatingsSpider(scrapy.Spider):
             self.log("parse a single review for: " + str(response.url))
             scraped_data = parse_review_page(response)
             yield scraped_data
-
 
 # TODO - add the URL to the parsed JSON document
 # TODO - add a try catch to the parse, log when you get an error parsing.
