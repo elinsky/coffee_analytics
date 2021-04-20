@@ -7,8 +7,9 @@ class CoffeeRatingsSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = [
-            # 'https://www.coffeereview.com/review/'
-            'https://www.coffeereview.com/review/foundry-blend/'
+            # 'https://www.coffeereview.com/review/nayamasasa-democratic-republic-of-the-congo/'
+            'https://www.coffeereview.com/review'
+            # 'https://www.coffeereview.com/review/foundry-blend/'
         ]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse)
@@ -95,3 +96,4 @@ class CoffeeRatingsSpider(scrapy.Spider):
 
 # TODO - add the URL to the parsed JSON document
 # TODO - add a try catch to the parse, log when you get an error parsing.
+# TODO - if I've already downloaded and parsed the page, then don't download again.
