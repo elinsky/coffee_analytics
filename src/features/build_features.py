@@ -61,5 +61,3 @@ def get_clean_dataset():
         ['Light', 'Medium-Light', 'Medium', 'Medium-Dark', 'Dark', 'Very Dark'], ordered=True)
 
     return df
-
-
