@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 import json
+from keras.preprocessing.text import Tokenizer
 
 def __insert_nans(df, field: str) -> None:
     """Given a pandas dataframe and a field, replace all 'NA' and 'NR' with np.nan.
@@ -61,3 +62,39 @@ def get_clean_dataset():
         ['Light', 'Medium-Light', 'Medium', 'Medium-Dark', 'Dark', 'Very Dark'], ordered=True)
 
     return df
+
+def get_roast_classification_dataset():
+    """Returns a dataset where blind assessment is used to classify roast levels.  Returns a tuple, where the first
+    item is a pandas series that contains the blind assessments.  The second item in the tuple is a pandas series that
+    contains the roast level classifications."""
+    df = get_clean_dataset()
+    # drop unused columns
+    df = df.drop(
+        ['roaster', 'bean', 'rating', 'roaster_location', 'coffee_origin', 'agtron', 'estimated_price', 'review_date',
+         'aroma', 'acidity_structure', 'body', 'flavor', 'aftertaste', 'with_milk', 'notes', 'bottom_line',
+         'who_should_drink_it'], axis=1)
+    # drop rows with NaN roast level or NaN blind_assessment
+    df = df.dropna()
+    # after dropping rows, reset the index
+    df = df.reset_index(drop=True)
+    X = df['blind_assessment']
+    y = df['roast_level']
+    # convert y from categorical text to integers
+    y = y.cat.codes
+    return X, y
+
+def get_vocab(docs, min_count=1):
+    """Given a iterable of documents, return a list of unique vocab words where each word is present at least min_count
+    times."""
+    t = Tokenizer()
+    t.fit_on_texts(docs)
+    vocab = []
+    for k in t.word_counts:
+        if t.word_counts[k] >= min_count:
+            vocab.append(k)
+    return vocab
+
+
+def tokenize_dataset(df):
+    # TODO
+    return
